@@ -1,70 +1,73 @@
-# Getting Started with Create React App
+# Real Time Online Chat App #
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Tech Stack
 
-## Available Scripts
+Frontend: React.js (S3)
 
-In the project directory, you can run:
+Backend: WebSocket (AWS API Gateway + Lambda)
 
-### `npm start`
+Database: DynamoDB (NOSQL)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# Lambda Functions
+You can find lambda functions /src/lambdas folder
+1. connect
+Triggered when a user connects to WebSocket.
+Stores the user's connection ID in the connections DynamoDB table.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. disconnect
+Triggered when a user disconnects from WebSocket.
+Removes the user's connection ID from the connections DynamoDB table.
 
-### `npm test`
+3. default
+Handles chat messages sent over WebSocket.
+Stores messages in the messages DynamoDB table.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# DynamoDB Tables
+1. messages
+Stores chat messages.
 
-### `npm run build`
+Schema:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+MessageId: Unique ID for each message.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+SenderName: Name of the message sender.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Content: The message content.
 
-### `npm run eject`
+CreatedAt: Message sent timestamp.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. connections
+Stores active WebSocket connection IDs.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Schema:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+ConnectionId: Unique connection ID.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# Deployment
 
-## Learn More
+Frontend
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Build react app with `npm run build` command. 
+2. Deploy build folder, configure S3 for static hosting.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Backend
 
-### Code Splitting
+1. Set up WebSocket API Gateway with routes:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+    $connect → connect Lambda.
+    $disconnect → disconnect Lambda.
+    $default → default Lambda for messages.
 
-### Analyzing the Bundle Size
+2. Deploy Lambda functions and API Gateway.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+# Environment Variables 
 
-### Making a Progressive Web App
+REACT_APP_WEBSOCKET_URL: WebSocket URL for the frontend.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+AWS_REGION: AWS region name.
 
-### Advanced Configuration
+AWS_API_GATEWAY_ENDPOINT: AWS API Gateway endpoint.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+DYNAMO_CONNECTION_TABLE_NAME: Connection table name.
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+DYNAMO_MESSAGE_TABLE_NAME: Message table name.
