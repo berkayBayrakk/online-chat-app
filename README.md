@@ -1,4 +1,4 @@
-# Real Time Online Chat App #
+# Real Time Online Chat App (AWS & React) #
 
 # Tech Stack
 
